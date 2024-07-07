@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import HeaderComponent from './HeaderComponent/HeaderComponent';
-import FooterComponent from './FooterComponent/FooterComponent';
 import CardComponent from './CardComponent/CardComponent';
 import CarritoComponent from './CarritoComponent/CarritoComponent';
 import data from './data.json';
-import FormLogin from './FormLogin/FormLoginComponent';
+import FormLogin from './FormLogin/FormLoginComponent'
 import { ThemeProvider } from './ThemeProvider/ThemeContext';
-import AsideComponent from './AsideComponent/AsideComponent';
 import { useCounter } from './hooks/useCounter';
+import NotFound from './views/NotFound';
+import Layout from './views/Layout';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProductDetail from './ProductDetail/ProductDetail';
+import { AuthProvider  } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
+
   const [buscarProducto, setBuscarProducto] = useState('');
   const [nombreEnviado, setNombreEnviado] = useState(null);
   const [emailEnviado, setEmailEnviado] = useState(null);
   const [currentView, setCurrentView] = useState('home');
-  const { contador, incrementar } = useCounter();
+  const { contador, incrementar, reiniciar } = useCounter();
   const [carrito, setCarrito] = useState({});
 
-  const handleSearch = (value) => { setBuscarProducto(value);};
+  const handleSearch = (value) => {
+    setBuscarProducto(value);
+  };
 
   const handleFormSubmit = (name, email) => {
     setNombreEnviado(name);
@@ -30,41 +36,80 @@ function App() {
     const newCarrito = { ...carrito };
     newCarrito[productId] = (newCarrito[productId] || 0) + 1;
     setCarrito(newCarrito);
-    incrementar(); 
+    incrementar();
   };
 
-  const handleCarrito = () => { setCurrentView('carrito'); };
+  const handleCarrito = () => {
+    setCurrentView('carrito');
+  };
 
-  const handleInicio = () => {setCurrentView('home'); };
+  const handleInicio = () => {
+    setCurrentView('home');
+  };
+
+  const handleCompra = () => {
+    setCarrito({});
+    reiniciar();
+  };
+
+  const handleResetearCarrito = () => {
+    setCarrito({});
+    reiniciar();
+  };
 
   return (
-    <ThemeProvider>
-      <div className="container-app">
-        <HeaderComponent 
-          onSearch={handleSearch} 
-          contador={contador} 
-          onCarritoClick={handleCarrito} 
-          onHomeClick={handleInicio} 
-          carrito={carrito} 
-        />
-        <AsideComponent nombreEnviado={nombreEnviado || 'Usuario'} />
-        {currentView === 'home' ? (
-          <CardComponent 
-            data={data} 
-            buscarProducto={buscarProducto} 
-            onAddProduct={agregarAlCarrito} 
-          />
-        ) : (
-          <CarritoComponent carrito={carrito} data={data} />
-        )}
-        <FormLogin 
-          onFormSubmit={handleFormSubmit} 
-          initialNombre={nombreEnviado} 
-          initialEmail={emailEnviado} 
-        />
-        <FooterComponent />
-      </div>
-    </ThemeProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ThemeProvider>
+          <Layout
+            contador={contador}
+            onSearch={handleSearch}
+            onCarritoClick={handleCarrito}
+            onHomeClick={handleInicio}
+            nombreEnviado={nombreEnviado}
+          >
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div className="container-app">
+                    {currentView === 'home' ? (
+                      <CardComponent
+                        data={data}
+                        buscarProducto={buscarProducto}
+                        onAddProduct={agregarAlCarrito}
+                      />
+                    ) : (
+                      <CarritoComponent
+                        carrito={carrito}
+                        data={data}
+                        onResetearCarrito={handleResetearCarrito}
+                        onCompra={handleCompra}
+                      />
+                    )}
+                  </div>
+                }
+              />
+              <Route
+                path="/login"
+                element={<FormLogin onFormSubmit={handleFormSubmit} />}
+              />
+              <Route element={<ProtectedRoute />}>
+                <Route
+                  path="/cart"
+                  element={<CarritoComponent carrito={carrito} data={data} onResetearCarrito={handleResetearCarrito} onCompra={handleCompra} />}
+                />
+                <Route
+                  path="/product/:id"
+                  element={<ProductDetail data={data} onAddProduct={agregarAlCarrito} />}
+                />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </ThemeProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

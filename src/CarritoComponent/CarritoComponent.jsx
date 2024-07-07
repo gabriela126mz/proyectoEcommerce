@@ -1,12 +1,21 @@
 import React from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
 
-function CarritoComponent({ carrito, data }) {
+function CarritoComponent({ carrito, data, onCompra, onResetearCarrito }) {
 
   const totalAPagar = Object.keys(carrito).reduce((total, productId) => {
     const product = data.find(item => item.id === parseInt(productId));
     return total + (product.price * carrito[productId]);
   }, 0);
+
+  const handleCompra = () => {
+    alert("Serás redirigido a la pasarela de pago");
+    onCompra();
+  };
+
+  const handleResetearCarrito = () => {
+    onResetearCarrito();
+  };
 
   return (
     <div className="row product-container">
@@ -33,7 +42,13 @@ function CarritoComponent({ carrito, data }) {
           </div>
         );
       })}
-      <h4><strong>Total a pagar: ${totalAPagar}</strong></h4>
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px' }}>
+          <button className="btn btn-primary" style={{ backgroundColor: "blue", marginRight: '10px' }} onClick={handleCompra}>Comprar</button>
+          <button className="btn btn-danger" style={{ backgroundColor: "red" }} onClick={handleResetearCarrito}>Resetear carrito</button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'right' }}>
+        <h4><strong>Total a pagar: ${totalAPagar}</strong></h4>
+      </div>
     </div>
   );
 }

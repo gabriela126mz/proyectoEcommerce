@@ -4,6 +4,8 @@ const contadorReducer = (state,action) => {
     switch (action.type) {
         case "incrementar":
             return state + 1;
+        case "reiniciar":
+            return 0;
         default:
             state;
     }
@@ -12,14 +14,19 @@ const contadorReducer = (state,action) => {
 
 
 export const useCounter = () => {
-    const [contador, dispatch] = useReducer(contadorReducer, 0);
-  
-    const incrementar = () => {
-      dispatch({ type: "incrementar" });
-    };
-  
-    return {
-      contador,
-      incrementar,
-    };
+  const [contador, dispatch] = useReducer(contadorReducer, 0);
+
+  const incrementar = () => {
+    dispatch({ type: "incrementar" });
   };
+
+  const reiniciar = () => {
+    dispatch({ type: "reiniciar" });
+  };
+
+  return {
+    contador,
+    incrementar,
+    reiniciar,
+  };
+};

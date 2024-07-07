@@ -1,33 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useAuth } from "./../context/AuthContext";
 import "./../App.css";
 
 function FormLogin({ onFormSubmit }) {
   const [nombreValor, setNombreValor] = useState("");
   const [emailValor, setEmailValor] = useState("");
-
-
-  useEffect(() => {
-    const localNombre = localStorage.getItem("nombreEnviado") || "";
-    const localEmail = localStorage.getItem("emailEnviado") || "";
-    setNombreValor(localNombre);
-    setEmailValor(localEmail);
-
-    return () => {
-      localStorage.removeItem("nombreEnviado");
-      localStorage.removeItem("emailEnviado");
-    };
-  }, []);
+  const { login, isAuthenticated, logout } = useAuth(); 
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChangeNombre = (e) => setNombreValor(e.target.value);
   const handleChangeEmail = (e) => setEmailValor(e.target.value);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem("nombreEnviado", nombreValor);
-    localStorage.setItem("emailEnviado", emailValor);
-    onFormSubmit(nombreValor, emailValor); 
-    setNombreValor("");
-    setEmailValor("");
+    onFormSubmit(nombreValor, emailValor);
+    login();
+    const redirectPath = location.state?.from?.pathname || "/";
+    navigate(redirectPath, { replace: true });
   };
 
   return (
@@ -46,7 +37,16 @@ function FormLogin({ onFormSubmit }) {
             value={emailValor}
             onChange={handleChangeEmail}
           />
-          <button type="submit">Entrar</button>
+          <button type="submit" style={{ display: "block", margin: "auto" }}>
+            Entrar
+          </button>
+          <div style={{ textAlign: "center", marginTop: "10px" }}>
+            {isAuthenticated && (
+              <Link type="button" onClick={() => logout()}>
+                Cerrar Sesión
+              </Link>
+            )}
+          </div>
         </form>
       </div>
     </div>

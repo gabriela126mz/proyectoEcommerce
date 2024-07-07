@@ -7,11 +7,14 @@ import userIcon from '../icons/user.ico';
 import favoriteIcon from '../icons/favorite.ico';
 import themeIcon from '../icons/theme.ico';
 import { ThemeContext } from './../ThemeProvider/ThemeContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-function HeaderComponent({ onSearch, contador, onCarritoClick, onHomeClick }) {
-  
+function HeaderComponent({ onSearch, contador, onHomeClick }) {
   const { styles, toggleTheme } = useContext(ThemeContext);
+  const { isAuthenticated } = useAuth();
   const [buscarProducto, setBuscarProducto] = useState('');
+  const navigate = useNavigate();
 
   const handleBuscador = (event) => {
     const value = event.target.value;
@@ -19,15 +22,25 @@ function HeaderComponent({ onSearch, contador, onCarritoClick, onHomeClick }) {
     onSearch(value);
   };
 
+  const handleCarritoClick = () => {
+    if (isAuthenticated) {
+      navigate('/cart');
+    } else {
+      navigate('/login', { state: { from: '/cart' } });
+    }
+  };
+
   return (
     <>
       <Navbar className="navbar-container" style={{ ...styles }}>
         <Nav className="nav-links">
-          <Nav.Link onClick={onHomeClick}><strong>MiTienda</strong></Nav.Link>
-          <Nav.Link>INICIO</Nav.Link>
-          <Nav.Link>CATEGORÍAS</Nav.Link>
-          <Nav.Link>OFERTAS</Nav.Link>
-          <Nav.Link>CONTACTO</Nav.Link>
+          <Nav.Link as={Link} to="/" onClick={onHomeClick}>
+              <strong>MiTienda</strong>
+          </Nav.Link>
+          <Nav.Link as={Link} to="/">INICIO</Nav.Link>
+          <Nav.Link as={Link} to="/categorias">CATEGORÍAS</Nav.Link>
+          <Nav.Link as={Link} to="/ofertas">OFERTAS</Nav.Link>
+          <Nav.Link as={Link} to="/contacto">CONTACTO</Nav.Link>
         </Nav>
         <Form className="form-buscador">
           <Form.Control
@@ -38,16 +51,16 @@ function HeaderComponent({ onSearch, contador, onCarritoClick, onHomeClick }) {
             onChange={handleBuscador}
           />
         </Form>
-        <button className="button-icons">
+        <Link to="/login" className="button-icons">
           <img src={userIcon} alt="Usuario Icono" className="icon" />
-        </button>
+        </Link>
         <button className="button-icons">
           <img src={favoriteIcon} alt="Favorito icono" className="icon" />
         </button>
         <button className="button-icons" onClick={toggleTheme}>
           <img alt="Tema Icono" className="icon" src={themeIcon} />
         </button>
-        <button className="button-icons" onClick={onCarritoClick}>
+        <button className="button-icons" onClick={handleCarritoClick}>
           <span>{contador}</span>
           <img src={cardIcon} alt="Carrito icono" className="icon" />
         </button>
