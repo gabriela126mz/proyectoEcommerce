@@ -1,32 +1,6 @@
 {
   "products": [
     {
-      "id": "1",
-      "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-      "price": 109.95,
-      "description": "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-      "category": "men's clothing",
-      "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-      "rating": {
-        "rate": 3.9,
-        "count": 120
-      }
-    },
-    {
-      "id": "5",
-      "title": "g",
-      "description": "From our Legends Collection, the Naga was inspired by the mythical water dragon that protects the ocean's pearl. Wear facing inward to be bestowed with love and abundance, or outward for protection.",
-      "price": 695,
-      "image": "https://unavatar.io/John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet"
-    },
-    {
-      "id": "6",
-      "title": "hg",
-      "description": "g",
-      "price": 168,
-      "image": "https://unavatar.io/Solid Gold Petite Micropave "
-    },
-    {
       "id": "7",
       "title": "White Gold Plated Princess",
       "price": 9.99,
@@ -200,6 +174,13 @@
       "description": "de",
       "price": "2",
       "image": "https://unavatar.io/ww"
+    },
+    {
+      "id": "beb24a33-4769-4bc8-a2f2-e16840f6eb2c",
+      "title": "ejemp",
+      "description": "ddd",
+      "price": "4",
+      "image": "https://unavatar.io/ejemp"
     }
   ]
 }
