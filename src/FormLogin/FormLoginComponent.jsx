@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "./../context/AuthContext";
 import "./../App.css";
@@ -6,19 +6,42 @@ import "./../App.css";
 function FormLogin({ onFormSubmit }) {
   const [nombreValor, setNombreValor] = useState("");
   const [emailValor, setEmailValor] = useState("");
-  const { login, isAuthenticated, logout } = useAuth(); 
+  const { login, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("usuario"));
+    if (storedUser) {
+      setNombreValor(storedUser.name);
+      setEmailValor(storedUser.email);
+    }
+  }, []);
 
   const handleChangeNombre = (e) => setNombreValor(e.target.value);
   const handleChangeEmail = (e) => setEmailValor(e.target.value);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const role = emailValor.includes("@admin") ? "admin" : "cliente";
+    const user = { name: nombreValor, email: emailValor, role };
     onFormSubmit(nombreValor, emailValor);
     login();
+
+
+    localStorage.setItem("usuario", JSON.stringify(user));
+    setNombreValor("");
+    setEmailValor("");
+
     const redirectPath = location.state?.from?.pathname || "/";
     navigate(redirectPath, { replace: true });
+  };
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("usuario");
+    setNombreValor("");
+    setEmailValor("");
   };
 
   return (
@@ -42,9 +65,7 @@ function FormLogin({ onFormSubmit }) {
           </button>
           <div style={{ textAlign: "center", marginTop: "10px" }}>
             {isAuthenticated && (
-              <Link type="button" onClick={() => logout()}>
-                Cerrar Sesión
-              </Link>
+              <Link type="button" onClick={handleLogout}>Cerrar Sesión</Link>
             )}
           </div>
         </form>
