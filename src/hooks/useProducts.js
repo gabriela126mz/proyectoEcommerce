@@ -1,121 +1,42 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
-
-const API_URL = 'http://localhost:3000/products';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import {
+  fetchProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct
+} from '../redux/reducers/productSlice';
 
 const useProducts = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [productos, setProductos] = useState([]);
-  const [editedProduct, setEditedProduct] = useState({
-    id: null,
-    title: '',
-    description: '',
-    price: '',
-    image: '',
-  });
+  const dispatch = useDispatch();
+  
+  const products = useSelector((state) => state.products.items);
+  const loading = useSelector((state) => state.products.loading);
+  const error = useSelector((state) => state.products.error);
 
   useEffect(() => {
-    const getProducts = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(API_URL);
-        setProductos(response.data);
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-      //404
-      //const errorResponse = {response: {status:404}};
-      //throw await Promise.reject(errorResponse);
-
-      //400 
-      //const errorResponse = {response:{status: 400}};
-      //throw await Promise.reject(errorResponse);
-
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          setError("No products");
-        } else {
-          setError("Error fetching products");
-        }
-      } finally {
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
-      }
-    }; 
-    getProducts();
-  }, []);
-
-  const eliminarProducto = async (id) => {
-    try {
-      await axios.delete(`${API_URL}/${id}`);
-      setProductos((prevProducts) => 
-        prevProducts.filter((product) => product.id !== id)
-      );
-    } catch (error) {
-      setError('Error deleting product');
-    }
+  const addNewProduct = (product) => {
+    dispatch(addProduct(product));
   };
 
-  const handleEdit = (id, title, description, price) => {
-    setEditedProduct({ id, title, description, price, image: `https://unavatar.io/${title}` });
+  const editProduct = (product) => {
+    dispatch(updateProduct(product));
   };
 
-  const handleSave = async () => {
-    if (editedProduct.id !== null) {
-      editProduct();
-    } else {
-      createProduct();
-    }
-  };
-
-  const createProduct = async () => {
-    try {
-      const newId = uuidv4();
-      const newProduct = { ...editedProduct, id: newId, image: `https://unavatar.io/${editedProduct.title}` };
-      const response = await axios.post(API_URL, newProduct);
-      setProductos((prevProducts) => [...prevProducts, response.data]);
-      setEditedProduct({ id: null, title: '', description: '', price: '', image: '' });
-    } catch (error) {
-      console.log("Error creating product: ", error);
-    }
-  };
-
-  const editProduct = async () => {
-    try {
-      const response = await axios.put(`${API_URL}/${editedProduct.id}`, editedProduct);
-      const updatedProduct = response.data;
-      setProductos((prevProducts) =>
-        prevProducts.map((product) => (
-          product.id === updatedProduct.id ? updatedProduct : product)
-        )
-      );
-      setEditedProduct({ id: null, title: '', description: '', price: '', image: '' });
-    } catch (error) {
-      console.log("Error editing product: ", error);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedProduct({ ...editedProduct, [name]: value });
-  };
-
-  const addProduct = () => {
-    setEditedProduct({ id: null, title: '', description: '', price: '', image: '' });
+  const removeProduct = (productId) => {
+    dispatch(deleteProduct(productId));
   };
 
   return {
-    productos,
-    editedProduct,
-    eliminarProducto,
-    handleEdit,
-    handleSave,
-    handleInputChange,
-    addProduct,
+    products,
     loading,
     error,
-    setError,
+    addNewProduct,
+    editProduct,
+    removeProduct
   };
 };
 

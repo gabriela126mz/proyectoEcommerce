@@ -1,13 +1,19 @@
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, Button, Row, Col } from 'react-bootstrap';
+import useProducts from '../hooks/useProducts';
 
-function ProductDetail({ data, onAddProduct }) {
+const ProductDetail = ({ onAddProduct }) => {
   const { id } = useParams();
+  const { products } = useProducts();
+  const producto = products.find((producto) => producto.id === id);
 
-  const producto = data.find((producto) => producto.id === parseInt(id));
+  if (!producto) {
+    return <div>Producto no encontrado.</div>;
+  }
 
   const handleAddProduct = () => {
-      onAddProduct(producto.id);
+    onAddProduct(producto);
   };
 
   return (
@@ -30,6 +36,6 @@ function ProductDetail({ data, onAddProduct }) {
       </Col>
     </Row>
   );
-}
+};
 
 export default ProductDetail;

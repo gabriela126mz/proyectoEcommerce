@@ -1,25 +1,30 @@
 import React, { createContext, useContext, useState } from 'react';
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const login = () => {
+  const login = (userData) => {
     setIsAuthenticated(true);
+    setUser(userData);
+    localStorage.setItem('usuario', JSON.stringify(userData));
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUser(null);
+    localStorage.removeItem('usuario');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }
