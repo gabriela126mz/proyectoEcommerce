@@ -1,0 +1,33 @@
+npm create vite@latest
+cd ...
+npm install 
+npm run dev
+
+npm install react-router-dom
+
+npm install -g json-server
+json-server --watch db.json  
+
+npm install axios
+npm install uuid
+
+npm create vite@latest
+cd ...
+npm install 
+npm run dev
+
+npm install react-router-dom
+
+npm install -g json-server
+json-server --watch db.json  
+
+npm install axios
+npm install uuid
+
+========
+Labs5 
+========
+npm install @reduxjs
+npm install toolkit react-redux
+npm install @reduxjs/toolkit redux
+npm install @vitejs/plugin-react

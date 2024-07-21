@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import "./../App.css";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from './../context/AuthContext';
+import './../App.css';
 
 function FormLogin({ onFormSubmit }) {
-  const [nombreValor, setNombreValor] = useState("");
-  const [emailValor, setEmailValor] = useState("");
-
+  const [nombreValor, setNombreValor] = useState('');
+  const [emailValor, setEmailValor] = useState('');
+  const { login, isAuthenticated, logout, user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const localNombre = localStorage.getItem("nombreEnviado") || "";
-    const localEmail = localStorage.getItem("emailEnviado") || "";
-    setNombreValor(localNombre);
-    setEmailValor(localEmail);
-
-    return () => {
-      localStorage.removeItem("nombreEnviado");
-      localStorage.removeItem("emailEnviado");
-    };
+    const storedUser = JSON.parse(localStorage.getItem('usuario'));
+    if (storedUser) {
+      setNombreValor(storedUser.name);
+      setEmailValor(storedUser.email);
+    }
   }, []);
 
   const handleChangeNombre = (e) => setNombreValor(e.target.value);
@@ -23,11 +23,22 @@ function FormLogin({ onFormSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem("nombreEnviado", nombreValor);
-    localStorage.setItem("emailEnviado", emailValor);
-    onFormSubmit(nombreValor, emailValor); 
-    setNombreValor("");
-    setEmailValor("");
+    const role = emailValor.includes('@admin') ? 'admin' : 'cliente';
+    const user = { name: nombreValor, email: emailValor, role };
+    onFormSubmit(nombreValor, emailValor);
+    login(user);
+
+    setNombreValor('');
+    setEmailValor('');
+
+    const redirectPath = location.state?.from?.pathname || '/';
+    navigate(redirectPath, { replace: true });
+  };
+
+  const handleLogout = () => {
+    logout();
+    setNombreValor('');
+    setEmailValor('');
   };
 
   return (
@@ -46,7 +57,12 @@ function FormLogin({ onFormSubmit }) {
             value={emailValor}
             onChange={handleChangeEmail}
           />
-          <button type="submit">Entrar</button>
+          <button type="submit" style={{ display: 'block', margin: 'auto' }}>Entrar</button>
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            {isAuthenticated && (
+              <Link type="button" onClick={handleLogout}>Cerrar Sesión</Link>
+            )}
+          </div>
         </form>
       </div>
     </div>
