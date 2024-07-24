@@ -35,14 +35,13 @@ function CardComponent({ buscarProducto, onAddProduct }) {
 
   const closeModal = () => setShowModal(false);
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    const productWithId = { ...editedProduct, id: editedProduct.id || uuidv4(), image: `https://unavatar.io/${editedProduct.title}` };
+  const handleSave = (data) => {
+    const productWithId = { ...data, id: data.id || uuidv4(), image: `https://unavatar.io/${data.title}` };
     
-    if (editedProduct.id) {
-      editProduct(productWithId); 
+    if (data.id) {
+      editProduct({ ...data, image: `https://unavatar.io/${data.title}` });
     } else {
-      addNewProduct(productWithId); 
+      addNewProduct({ ...data, id: uuidv4(), image: `https://unavatar.io/${data.title}` });
     }
     
     closeModal();
